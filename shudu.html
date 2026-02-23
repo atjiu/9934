@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>数独挑战 - 单击高亮双击选数</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 游戏信息栏 */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .mode-display {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 25px;
+            background: #667eea;
+            color: white;
+        }
+
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .errors {
+            font-size: 16px;
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .errors span {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .hint-count {
+            font-size: 16px;
+            color: #FF9800;
+            font-weight: bold;
+        }
+
+        .hint-count span {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 模式选择 */
+        .mode-selector {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 70px;
+        }
+
+        .mode-btn.easy {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .mode-btn.easy:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.medium {
+            background: #FF9800;
+            color: white;
+        }
+
+        .mode-btn.medium:hover {
+            background: #e68a00;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.hard {
+            background: #f44336;
+            color: white;
+        }
+
+        .mode-btn.hard:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.master {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .mode-btn.master:hover {
+            background: #7b1fa2;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            border: 2px solid white;
+        }
+
+        /* 数独网格容器 */
+        .sudoku-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        /* 数独网格 */
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            background: #999;
+            border: 3px solid #333;
+            position: relative;
+        }
+
+        .sudoku-cell {
+            aspect-ratio: 1;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sudoku-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            background: transparent;
+            outline: none;
+            padding: 0;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            pointer-events: none; /* 让输入框不拦截点击事件 */
+        }
+
+        /* 高亮样式 - 行和列 */
+        .sudoku-cell.highlight-row {
+            background-color: #e3f2fd;
+        }
+
+        .sudoku-cell.highlight-col {
+            background-color: #e8f5e8;
+        }
+
+        .sudoku-cell.highlight-box {
+            background-color: #fff3e0;
+        }
+
+        /* 相同数字高亮 */
+        .sudoku-cell.highlight-same-number {
+            background-color: #ffcdd2 !important;
+        }
+
+        /* 当前选中格子 */
+        .sudoku-cell.current-cell {
+            background-color: #bbdefb !important;
+        }
+
+        .sudoku-cell.current-cell input {
+            background-color: #bbdefb;
+        }
+
+        /* 初始数字为黑色 */
+        .sudoku-cell input.initial {
+            color: #000000;
+            font-weight: bold;
+        }
+
+        /* 用户输入为蓝色 */
+        .sudoku-cell input.user-input {
+            color: #2196F3;
+        }
+
+        /* 错误输入为红色 */
+        .sudoku-cell input.error {
+            color: #f44336;
+        }
+
+        /* 3x3宫格边界 */
+        .sudoku-cell:nth-child(3n) {
+            border-right: 2px solid #333;
+        }
+
+        .sudoku-cell:nth-child(9n) {
+            border-right: none;
+        }
+
+        .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+            border-bottom: 2px solid #333;
+        }
+
+        /* 数字选择器 */
+        .number-picker {
+            position: absolute;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            padding: 15px;
+            z-index: 100;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 200px;
+            border: 2px solid #667eea;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .number-picker button {
+            aspect-ratio: 1;
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .number-picker button:active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        /* 按钮组 */
+        .button-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .btn-reset {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #7b1fa2;
+            transform: translateY(-2px);
+        }
+
+        .btn-clear {
+            background: #607D8B;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #455a64;
+            transform: translateY(-2px);
+        }
+
+        .btn-hint {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn-hint:hover {
+            background: #e68a00;
+            transform: translateY(-2px);
+        }
+
+        .btn-pause {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .btn-rest {
+            background: #795548;
+            color: white;
+        }
+
+        .btn-rest:hover {
+            background: #5d4037;
+            transform: translateY(-2px);
+        }
+
+        /* 消息提示 */
+        .message {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+
+        /* 模态框通用样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .modal-content .stats {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .modal-content .stats p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .modal-content .best-record {
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .modal-content .best-record h3 {
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .modal-content .best-record .record-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .btn-next {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        .btn-next:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* 暂停面板 */
+        .pause-modal-content h2 {
+            color: #2196F3;
+        }
+
+        .pause-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-resume {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .btn-resume:hover {
+            background: #45a049;
+        }
+
+        /* 游戏结束面板 */
+        .gameover-modal-content h2 {
+            color: #f44336;
+        }
+
+        /* 使用说明 */
+        .instructions {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .instructions p {
+            margin: 4px 0;
+        }
+
+        .penalty-info {
+            color: #FF9800;
+            font-weight: bold;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .game-info {
+                font-size: 12px;
+            }
+
+            .mode-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+
+            .sudoku-cell input {
+                font-size: 18px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 70px;
+            }
+
+            .number-picker {
+                width: 180px;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .number-picker button {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 数独挑战</h1>
+
+        <!-- 游戏信息栏 -->
+        <div class="game-info">
+            <div class="mode-display" id="mode-display">未选择模式</div>
+            <div class="timer" id="timer">00:00</div>
+            <div class="errors">
+                <span>❌ <span id="error-count">0</span>/3</span>
+            </div>
+            <div class="hint-count">
+                <span>💡 <span id="hint-count">0</span></span>
+            </div>
+        </div>
+
+        <!-- 模式选择 -->
+        <div class="mode-selector">
+            <button class="mode-btn easy" data-mode="easy">初级</button>
+            <button class="mode-btn medium" data-mode="medium">中级</button>
+            <button class="mode-btn hard" data-mode="hard">困难</button>
+            <button class="mode-btn master" data-mode="master">大师</button>
+        </div>
+
+        <!-- 数独网格容器 -->
+        <div class="sudoku-container">
+            <div class="sudoku-grid" id="sudoku-grid"></div>
+            <!-- 数字选择器会动态插入到这里 -->
+        </div>
+
+        <!-- 按钮组 -->
+        <div class="button-container">
+            <button class="btn btn-reset" id="reset-btn">重新开始</button>
+            <button class="btn btn-clear" id="clear-btn">清除输入</button>
+            <button class="btn btn-hint" id="hint-btn">提示</button>
+            <button class="btn btn-pause" id="pause-btn">暂停</button>
+            <button class="btn btn-rest" id="rest-btn">休息一会</button>
+        </div>
+
+        <!-- 消息提示 -->
+        <div class="message" id="message"></div>
+
+        <!-- 成功结算面板 -->
+        <div class="modal" id="completion-modal">
+            <div class="modal-content">
+                <h2>🎉 恭喜完成！</h2>
+                <div class="stats">
+                    <p>📊 模式：<span id="complete-mode">初级</span></p>
+                    <p>⏱️ 用时：<span id="complete-time">00:00</span></p>
+                    <p>❌ 错误次数：<span id="complete-errors">0</span></p>
+                    <p>💡 使用提示：<span id="complete-hints">0</span> 次</p>
+                    <p class="penalty-info">提示惩罚：+<span id="hint-penalty">0</span>分钟</p>
+                </div>
+
+                <div class="best-record" id="best-record">
+                    <h3>🏆 最佳记录</h3>
+                    <div id="best-record-list"></div>
+                </div>
+
+                <button class="btn btn-next" id="next-game-btn">下一局</button>
+            </div>
+        </div>
+
+        <!-- 失败结算面板 -->
+        <div class="modal" id="gameover-modal">
+            <div class="modal-content gameover-modal-content">
+                <h2>😵 游戏失败</h2>
+                <div class="stats">
+                    <p>📊 模式：<span id="gameover-mode">初级</span></p>
+                    <p>⏱️ 用时：<span id="gameover-time">00:00</span></p>
+                    <p>❌ 错误次数：<span id="gameover-errors">3</span>/3</p>
+                    <p>💡 使用提示：<span id="gameover-hints">0</span> 次</p>
+                </div>
+                <p style="color: #666; margin: 20px 0;">再接再厉，下次小心一些！</p>
+                <button class="btn btn-next" id="gameover-next-btn">重新挑战</button>
+            </div>
+        </div>
+
+        <!-- 暂停面板 -->
+        <div class="modal" id="pause-modal">
+            <div class="modal-content pause-modal-content">
+                <h2>⏸️ 游戏暂停</h2>
+                <div class="stats">
+                    <p>当前模式：<span id="pause-mode">初级</span></p>
+                    <p>已用时间：<span id="pause-time">00:00</span></p>
+                    <p>错误次数：<span id="pause-errors">0</span>/3</p>
+                    <p>提示次数：<span id="pause-hints">0</span></p>
+                </div>
+                <div class="pause-buttons">
+                    <button class="btn btn-resume" id="resume-btn">继续游戏</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="instructions">
+            <p>📝 游戏规则：</p>
+            <p>• 选择难度模式自动开始游戏，每局题目都不同</p>
+            <p>• <span style="color: #000000; font-weight: bold;">黑色数字</span> 是题目</p>
+            <p>• <span style="color: #2196F3; font-weight: bold;">蓝色数字</span> 是您的输入</p>
+            <p>• 单击格子查看高亮（行、列、九宫格、相同数字）</p>
+            <p>• 双击空白格子弹出数字选择器</p>
+            <p>• 每填一个数字自动验证，错误会扣除一次机会</p>
+            <p>• 只有<span style="color: #f44336;">3次</span>出错机会</p>
+            <p>• <span class="penalty-info">提示惩罚：初级+1分钟，中级+3分钟，困难+5分钟，大师+10分钟</span></p>
+            <p>• 填满所有空格即可获胜</p>
+        </div>
+    </div>
+
+    <script>
+        // 数独生成器类
+        class SudokuGenerator {
+            constructor() {
+                this.board = Array(9).fill().map(() => Array(9).fill(0));
+            }
+
+            // 生成完整数独解
+            generateFullSolution() {
+                this.board = Array(9).fill().map(() => Array(9).fill(0));
+                this.solve(this.board);
+                return this.board.map(row => [...row]);
+            }
+
+            // 递归求解生成完整数独
+            solve(board) {
+                const empty = this.findEmpty(board);
+                if (!empty) return true;
+
+                const { row, col } = empty;
+                const numbers = this.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+                for (const num of numbers) {
+                    if (this.isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (this.solve(board)) return true;
+                        board[row][col] = 0;
+                    }
+                }
+                return false;
+            }
+
+            // 根据难度生成题目
+            generatePuzzle(difficulty) {
+                // 生成完整解
+                const solution = this.generateFullSolution();
+
+                // 根据难度决定要挖掉多少个数字
+                let cellsToRemove;
+                switch(difficulty) {
+                    case 'easy':
+                        cellsToRemove = 35; // 剩余46个数字
+                        break;
+                    case 'medium':
+                        cellsToRemove = 45; // 剩余36个数字
+                        break;
+                    case 'hard':
+                        cellsToRemove = 50; // 剩余31个数字
+                        break;
+                    case 'master':
+                        cellsToRemove = 55; // 剩余26个数字
+                        break;
+                    default:
+                        cellsToRemove = 40;
+                }
+
+                // 创建题目板（复制解决方案）
+                const puzzle = solution.map(row => [...row]);
+
+                // 随机挖掉数字
+                const positions = [];
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        positions.push([i, j]);
+                    }
+                }
+
+                // 随机打乱位置
+                this.shuffle(positions);
+
+                // 挖掉指定数量的数字
+                for (let k = 0; k < cellsToRemove; k++) {
+                    const [i, j] = positions[k];
+                    puzzle[i][j] = 0;
+                }
+
+                return {
+                    puzzle: puzzle,
+                    solution: solution
+                };
+            }
+
+            // 洗牌算法
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // 寻找空格
+            findEmpty(board) {
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (board[i][j] === 0) return { row: i, col: j };
+                    }
+                }
+                return null;
+            }
+
+            // 验证数字是否有效
+            isValid(board, row, col, num) {
+                // 检查行
+                for (let j = 0; j < 9; j++) {
+                    if (board[row][j] === num) return false;
+                }
+
+                // 检查列
+                for (let i = 0; i < 9; i++) {
+                    if (board[i][col] === num) return false;
+                }
+
+                // 检查3x3宫格
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+
+                for (let i = startRow; i < startRow + 3; i++) {
+                    for (let j = startCol; j < startCol + 3; j++) {
+                        if (board[i][j] === num) return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        // 数独游戏类
+        class SudokuGame {
+            constructor() {
+                this.generator = new SudokuGenerator();
+                this.board = Array(9).fill().map(() => Array(9).fill(0));
+                this.solution = Array(9).fill().map(() => Array(9).fill(0));
+                this.initialBoard = Array(9).fill().map(() => Array(9).fill(false));
+                this.userBoard = Array(9).fill().map(() => Array(9).fill(0));
+
+                this.currentMode = null;
+                this.errorCount = 0;
+                this.maxErrors = 3;
+                this.hintCount = 0;
+                this.gameActive = false;
+                this.isPaused = false;
+                this.startTime = null;
+                this.timerInterval = null;
+                this.elapsedSeconds = 0;
+                this.errorInputs = new Set(); // 记录错误输入的位置，防止重复计数
+
+                // 当前选中的格子
+                this.selectedRow = null;
+                this.selectedCol = null;
+                this.numberPicker = null;
+                this.clickTimer = null; // 用于区分单击和双击
+
+                // 成绩记录
+                this.records = this.loadRecords();
+
+                this.initUI();
+            }
+
+            // 初始化UI
+            initUI() {
+                this.grid = document.getElementById('sudoku-grid');
+                this.messageDiv = document.getElementById('message');
+                this.modeDisplay = document.getElementById('mode-display');
+                this.timerDisplay = document.getElementById('timer');
+                this.errorCountDisplay = document.getElementById('error-count');
+                this.hintCountDisplay = document.getElementById('hint-count');
+                this.completionModal = document.getElementById('completion-modal');
+                this.gameoverModal = document.getElementById('gameover-modal');
+                this.pauseModal = document.getElementById('pause-modal');
+                this.cells = [];
+
+                this.createGrid();
+                this.bindEvents();
+                this.updateBestRecordDisplay();
+            }
+
+            // 创建网格
+            createGrid() {
+                this.grid.innerHTML = '';
+                this.cells = [];
+
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'sudoku-cell';
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.inputMode = 'none';
+                        input.maxLength = 1;
+                        input.dataset.row = i;
+                        input.dataset.col = j;
+                        input.disabled = true;
+                        input.readOnly = true;
+
+                        cell.appendChild(input);
+                        this.grid.appendChild(cell);
+
+                        if (!this.cells[i]) {
+                            this.cells[i] = [];
+                        }
+                        this.cells[i][j] = input;
+
+                        // 添加点击事件处理
+                        this.attachCellEvents(cell, i, j);
+                    }
+                }
+            }
+
+            // 为单元格附加事件
+            attachCellEvents(cell, row, col) {
+                let clickCount = 0;
+
+                cell.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (!this.gameActive || this.isPaused) return;
+
+                    clickCount++;
+
+                    if (clickCount === 1) {
+                        this.clickTimer = setTimeout(() => {
+                            // 单击：高亮显示
+                            if (clickCount === 1) {
+                                this.highlightCell(row, col);
+                            }
+                            clickCount = 0;
+                        }, 200);
+                    } else if (clickCount === 2) {
+                        // 双击：显示数字选择器（如果是空白格子）
+                        clearTimeout(this.clickTimer);
+                        clickCount = 0;
+
+                        // 只有空白格子才能弹出数字选择器
+                        if (!this.initialBoard[row][col] && this.userBoard[row][col] === 0) {
+                            this.showNumberPicker(row, col);
+                        } else {
+                            // 如果不是空白格子，只高亮
+                            this.highlightCell(row, col);
+                        }
+                    }
+                });
+            }
+
+            // 显示数字选择器
+            showNumberPicker(row, col) {
+                // 移除现有的数字选择器
+                this.hideNumberPicker();
+
+                // 保存当前选中的格子
+                this.selectedRow = row;
+                this.selectedCol = col;
+
+                // 高亮当前格子
+                this.highlightCell(row, col);
+
+                // 获取格子位置
+                const cell = this.cells[row][col].parentElement;
+                const rect = cell.getBoundingClientRect();
+                const containerRect = document.querySelector('.sudoku-container').getBoundingClientRect();
+
+                // 创建数字选择器
+                this.numberPicker = document.createElement('div');
+                this.numberPicker.className = 'number-picker';
+
+                // 计算位置（确保在可视区域内）
+                let top = rect.bottom - containerRect.top + 5;
+                let left = rect.left - containerRect.left;
+
+                // 如果太靠右，向左偏移
+                if (left > containerRect.width - 210) {
+                    left = containerRect.width - 210;
+                }
+
+                // 如果太靠下，显示在格子上面
+                if (top > containerRect.height - 250) {
+                    top = rect.top - containerRect.top - 160;
+                }
+
+                this.numberPicker.style.top = top + 'px';
+                this.numberPicker.style.left = left + 'px';
+
+                // 添加数字按钮 1-9
+                for (let i = 1; i <= 9; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.setCellValue(row, col, i);
+                        this.hideNumberPicker();
+                    });
+                    this.numberPicker.appendChild(btn);
+                }
+
+                document.querySelector('.sudoku-container').appendChild(this.numberPicker);
+
+                // 设置一个短暂的延迟后添加外部点击监听
+                setTimeout(() => {
+                    document.addEventListener('click', this.handleOutsideClick);
+                }, 100);
+            }
+
+            // 处理外部点击
+            handleOutsideClick = (e) => {
+                if (this.numberPicker && !this.numberPicker.contains(e.target) &&
+                    !e.target.closest('.sudoku-cell')) {
+                    this.hideNumberPicker();
+                }
+            }
+
+            // 隐藏数字选择器
+            hideNumberPicker() {
+                if (this.numberPicker) {
+                    this.numberPicker.remove();
+                    this.numberPicker = null;
+                    document.removeEventListener('click', this.handleOutsideClick);
+                }
+            }
+
+            // 设置单元格的值
+            setCellValue(row, col, num) {
+                if (!this.gameActive || this.isPaused) return;
+                if (this.initialBoard[row][col]) return;
+
+                const input = this.cells[row][col];
+                const key = `${row},${col}`;
+
+                // 验证数字是否正确
+                if (num === this.solution[row][col]) {
+                    input.value = num;
+                    input.classList.add('user-input');
+                    input.classList.remove('error');
+                    this.userBoard[row][col] = num;
+
+                    // 如果这个位置之前是错误输入，从集合中移除
+                    if (this.errorInputs.has(key)) {
+                        this.errorInputs.delete(key);
+                    }
+
+                    // 检查是否完成
+                    this.checkCompletion();
+                } else {
+                    // 错误答案 - 检查是否已经计数过这个位置的错误
+                    if (!this.errorInputs.has(key)) {
+                        this.errorCount++;
+                        this.errorInputs.add(key);
+                        this.updateErrorCount();
+
+                        // 显示错误消息
+                        this.showMessage(`错误！还剩 ${this.maxErrors - this.errorCount} 次机会`, 'warning');
+
+                        // 检查是否超过最大错误次数
+                        if (this.errorCount >= this.maxErrors) {
+                            this.gameOver();
+                        }
+                    }
+
+                    input.value = num;
+                    input.classList.add('error');
+                    input.classList.remove('user-input');
+
+                    // 1秒后清除错误标记和值
+                    setTimeout(() => {
+                        if (input.classList.contains('error')) {
+                            input.classList.remove('error');
+                            input.value = '';
+                            this.userBoard[row][col] = 0;
+                        }
+                    }, 1000);
+                }
+            }
+
+            // 高亮相关格子
+            highlightCell(row, col) {
+                this.clearHighlights();
+
+                if (!this.gameActive || this.isPaused) return;
+
+                const currentValue = this.getCellValue(row, col);
+
+                // 高亮行
+                for (let j = 0; j < 9; j++) {
+                    this.cells[row][j].parentElement.classList.add('highlight-row');
+                }
+
+                // 高亮列
+                for (let i = 0; i < 9; i++) {
+                    this.cells[i][col].parentElement.classList.add('highlight-col');
+                }
+
+                // 高亮九宫格
+                const startRow = Math.floor(row / 3) * 3;
+                const startCol = Math.floor(col / 3) * 3;
+                for (let i = startRow; i < startRow + 3; i++) {
+                    for (let j = startCol; j < startCol + 3; j++) {
+                        this.cells[i][j].parentElement.classList.add('highlight-box');
+                    }
+                }
+
+                // 高亮相同数字
+                if (currentValue !== 0) {
+                    for (let i = 0; i < 9; i++) {
+                        for (let j = 0; j < 9; j++) {
+                            if (this.getCellValue(i, j) === currentValue) {
+                                if (i !== row || j !== col) {
+                                    this.cells[i][j].parentElement.classList.add('highlight-same-number');
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 高亮当前格子
+                this.cells[row][col].parentElement.classList.add('current-cell');
+            }
+
+            // 获取单元格的值
+            getCellValue(row, col) {
+                const input = this.cells[row][col];
+                const value = input.value;
+                return value ? parseInt(value, 10) : 0;
+            }
+
+            // 清除高亮
+            clearHighlights() {
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        const cell = this.cells[i][j].parentElement;
+                        cell.classList.remove('highlight-row', 'highlight-col', 'highlight-box', 'highlight-same-number', 'current-cell');
+                    }
+                }
+            }
+
+            // 绑定事件
+            bindEvents() {
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const mode = e.target.dataset.mode;
+                        this.startNewGame(mode);
+                    });
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', () => {
+                    if (this.currentMode) {
+                        this.startNewGame(this.currentMode);
+                    }
+                });
+
+                document.getElementById('clear-btn').addEventListener('click', () => {
+                    this.clearUserInput();
+                });
+
+                document.getElementById('hint-btn').addEventListener('click', () => {
+                    this.giveHint();
+                });
+
+                document.getElementById('pause-btn').addEventListener('click', () => {
+                    this.togglePause();
+                });
+
+                document.getElementById('rest-btn').addEventListener('click', () => {
+                    this.takeRest();
+                });
+
+                document.getElementById('resume-btn').addEventListener('click', () => {
+                    this.resumeGame();
+                });
+
+                document.getElementById('next-game-btn').addEventListener('click', () => {
+                    this.completionModal.classList.remove('show');
+                    if (this.currentMode) {
+                        this.startNewGame(this.currentMode);
+                    }
+                });
+
+                document.getElementById('gameover-next-btn').addEventListener('click', () => {
+                    this.gameoverModal.classList.remove('show');
+                    if (this.currentMode) {
+                        this.startNewGame(this.currentMode);
+                    }
+                });
+            }
+
+            // 开始新游戏
+            startNewGame(mode) {
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                // 更新按钮状态
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.mode === mode) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                this.currentMode = mode;
+                this.modeDisplay.textContent = this.getModeName(mode);
+                this.errorCount = 0;
+                this.hintCount = 0;
+                this.gameActive = true;
+                this.isPaused = false;
+                this.elapsedSeconds = 0;
+                this.errorInputs.clear();
+                this.updateTimer();
+                this.updateHintCount();
+
+                // 生成新题目
+                const { puzzle, solution } = this.generator.generatePuzzle(mode);
+                this.board = puzzle.map(row => [...row]);
+                this.solution = solution;
+                this.initialBoard = puzzle.map(row => row.map(val => val !== 0));
+                this.userBoard = Array(9).fill().map(() => Array(9).fill(0));
+
+                // 显示题目
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        const input = this.cells[i][j];
+                        if (puzzle[i][j] !== 0) {
+                            input.value = puzzle[i][j];
+                            input.classList.add('initial');
+                            input.classList.remove('user-input', 'error');
+                        } else {
+                            input.value = '';
+                            input.classList.remove('initial', 'user-input', 'error');
+                        }
+                    }
+                }
+
+                // 更新UI
+                this.updateErrorCount();
+                this.enableUserInput();
+                this.clearHighlights();
+
+                // 关闭所有弹窗
+                this.completionModal.classList.remove('show');
+                this.gameoverModal.classList.remove('show');
+                this.pauseModal.classList.remove('show');
+
+                // 开始计时
+                this.startTimer();
+
+                // 清除消息
+                this.messageDiv.className = 'message';
+            }
+
+            // 获取提示惩罚时间（分钟）
+            getHintPenalty() {
+                const penalties = {
+                    'easy': 1,
+                    'medium': 3,
+                    'hard': 5,
+                    'master': 10
+                };
+                return penalties[this.currentMode] || 0;
+            }
+
+            // 给予提示
+            giveHint() {
+                if (!this.gameActive || this.isPaused) return;
+
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                // 寻找第一个空格
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (!this.initialBoard[i][j] && this.userBoard[i][j] === 0) {
+                            const correctNum = this.solution[i][j];
+
+                            // 使用setCellValue设置值
+                            this.setCellValue(i, j, correctNum);
+
+                            // 增加提示计数
+                            this.hintCount++;
+                            this.updateHintCount();
+
+                            // 增加惩罚时间
+                            const penaltyMinutes = this.getHintPenalty();
+                            const penaltySeconds = penaltyMinutes * 60;
+
+                            // 直接增加 elapsedSeconds
+                            this.elapsedSeconds += penaltySeconds;
+
+                            // 更新 startTime，让计时器基于新的 elapsedSeconds 继续计时
+                            if (this.startTime) {
+                                this.startTime = Date.now() - this.elapsedSeconds * 1000;
+                            }
+
+                            // 立即更新显示
+                            this.updateTimer();
+
+                            this.showMessage(`已填入一个正确数字 (惩罚+${penaltyMinutes}分钟)`, 'info');
+
+                            return;
+                        }
+                    }
+                }
+
+                this.showMessage('没有可提示的空格了', 'info');
+            }
+
+            // 暂停/恢复切换
+            togglePause() {
+                if (!this.gameActive) return;
+
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                if (!this.isPaused) {
+                    // 暂停游戏
+                    this.isPaused = true;
+                    this.stopTimer();
+                    this.disableUserInput();
+
+                    // 更新暂停面板信息
+                    document.getElementById('pause-mode').textContent = this.getModeName(this.currentMode);
+                    document.getElementById('pause-time').textContent = this.formatTime(this.elapsedSeconds);
+                    document.getElementById('pause-errors').textContent = `${this.errorCount}/3`;
+                    document.getElementById('pause-hints').textContent = this.hintCount;
+
+                    this.pauseModal.classList.add('show');
+                    this.showMessage('游戏已暂停', 'info');
+                }
+            }
+
+            // 恢复游戏
+            resumeGame() {
+                this.isPaused = false;
+                this.pauseModal.classList.remove('show');
+
+                // 恢复计时器时重新设置 startTime
+                if (this.gameActive) {
+                    this.startTimer();
+                    this.enableUserInput();
+                }
+
+                this.showMessage('游戏继续', 'success');
+            }
+
+            // 休息一会功能
+            takeRest() {
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                // 重置游戏状态
+                this.gameActive = false;
+                this.stopTimer();
+                this.disableUserInput();
+
+                // 清空所有格子
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        const input = this.cells[i][j];
+                        input.value = '';
+                        input.classList.remove('initial', 'user-input', 'error');
+                    }
+                }
+
+                // 重置所有状态
+                this.currentMode = null;
+                this.modeDisplay.textContent = '未选择模式';
+                this.errorCount = 0;
+                this.hintCount = 0;
+                this.elapsedSeconds = 0;
+                this.errorInputs.clear();
+                this.updateErrorCount();
+                this.updateHintCount();
+                this.updateTimer();
+
+                // 移除所有按钮的active状态
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // 清除高亮
+                this.clearHighlights();
+
+                this.showMessage('已休息，选择难度开始新游戏', 'info');
+            }
+
+            // 检查是否完成
+            checkCompletion() {
+                // 检查是否所有空格都已填满
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (!this.initialBoard[i][j] && this.userBoard[i][j] === 0) {
+                            return; // 还有空格未填
+                        }
+                    }
+                }
+
+                // 验证所有输入是否正确
+                let allCorrect = true;
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (!this.initialBoard[i][j]) {
+                            if (this.userBoard[i][j] !== this.solution[i][j]) {
+                                allCorrect = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (allCorrect) {
+                    this.gameComplete();
+                }
+            }
+
+            // 游戏完成
+            gameComplete() {
+                this.gameActive = false;
+                this.stopTimer();
+
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                // 计算惩罚时间
+                const penaltyMinutes = this.hintCount * this.getHintPenalty();
+
+                // 更新记录
+                this.updateRecord(this.currentMode, this.elapsedSeconds, this.errorCount, this.hintCount);
+
+                // 显示结算面板
+                document.getElementById('complete-mode').textContent = this.getModeName(this.currentMode);
+                document.getElementById('complete-time').textContent = this.formatTime(this.elapsedSeconds);
+                document.getElementById('complete-errors').textContent = this.errorCount;
+                document.getElementById('complete-hints').textContent = this.hintCount;
+                document.getElementById('hint-penalty').textContent = penaltyMinutes;
+
+                this.updateBestRecordDisplay();
+                this.completionModal.classList.add('show');
+
+                this.showMessage('恭喜！你完成了数独！', 'success');
+            }
+
+            // 游戏结束（超过错误次数）
+            gameOver() {
+                this.gameActive = false;
+                this.stopTimer();
+                this.disableUserInput();
+
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                // 显示失败结算面板
+                document.getElementById('gameover-mode').textContent = this.getModeName(this.currentMode);
+                document.getElementById('gameover-time').textContent = this.formatTime(this.elapsedSeconds);
+                document.getElementById('gameover-errors').textContent = this.errorCount;
+                document.getElementById('gameover-hints').textContent = this.hintCount;
+
+                this.gameoverModal.classList.add('show');
+
+                this.showMessage('游戏结束！超过最大错误次数', 'error');
+            }
+
+            // 清除用户输入
+            clearUserInput() {
+                if (!this.gameActive || this.isPaused) return;
+
+                // 隐藏数字选择器
+                this.hideNumberPicker();
+
+                for (let i = 0; i < 9; i++) {
+                    for (let j = 0; j < 9; j++) {
+                        if (!this.initialBoard[i][j]) {
+                            const input = this.cells[i][j];
+                            input.value = '';
+                            input.classList.remove('user-input', 'error');
+                            this.userBoard[i][j] = 0;
+                        }
+                    }
+                }
+
+                // 清空错误记录
+                this.errorInputs.clear();
+            }
+
+            // 计时器控制
+            startTimer() {
+                this.stopTimer();
+
+                // 确保 startTime 基于当前 elapsedSeconds
+                this.startTime = Date.now() - this.elapsedSeconds * 1000;
+
+                this.timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    // 重新计算 elapsedSeconds，确保惩罚时间被保留
+                    this.elapsedSeconds = Math.floor((now - this.startTime) / 1000);
+                    this.updateTimer();
+                }, 100);
+            }
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            }
+
+            updateTimer() {
+                this.timerDisplay.textContent = this.formatTime(this.elapsedSeconds);
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // 更新错误计数显示
+            updateErrorCount() {
+                this.errorCountDisplay.textContent = this.errorCount;
+            }
+
+            // 更新提示计数显示
+            updateHintCount() {
+                this.hintCountDisplay.textContent = this.hintCount;
+            }
+
+            // 启用用户输入（只是启用点击，不能直接输入）
+            enableUserInput() {
+                // 所有单元格都已经可以点击，不需要额外操作
+            }
+
+            // 禁用用户输入
+            disableUserInput() {
+                // 所有单元格的点击事件仍然可以触发，但会在事件处理中检查 gameActive
+            }
+
+            // 显示消息
+            showMessage(text, type) {
+                this.messageDiv.textContent = text;
+                this.messageDiv.className = `message ${type}`;
+
+                if (type !== 'error') {
+                    setTimeout(() => {
+                        this.messageDiv.className = 'message';
+                    }, 3000);
+                }
+            }
+
+            // 获取模式名称
+            getModeName(mode) {
+                const names = {
+                    easy: '初级',
+                    medium: '中级',
+                    hard: '困难',
+                    master: '大师'
+                };
+                return names[mode] || mode;
+            }
+
+            // 加载记录
+            loadRecords() {
+                const saved = localStorage.getItem('sudoku_records_v2');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+                return {
+                    easy: { time: null, errors: null, hints: null },
+                    medium: { time: null, errors: null, hints: null },
+                    hard: { time: null, errors: null, hints: null },
+                    master: { time: null, errors: null, hints: null }
+                };
+            }
+
+            // 更新记录
+            updateRecord(mode, time, errors, hints) {
+                const currentBest = this.records[mode];
+
+                if (!currentBest.time || time < currentBest.time) {
+                    this.records[mode] = { time, errors, hints };
+                    localStorage.setItem('sudoku_records_v2', JSON.stringify(this.records));
+                }
+            }
+
+            // 更新最佳记录显示
+            updateBestRecordDisplay() {
+                const listDiv = document.getElementById('best-record-list');
+                let html = '';
+
+                for (const [mode, record] of Object.entries(this.records)) {
+                    if (record.time) {
+                        const penaltyMinutes = record.hints * this.getHintPenaltyForMode(mode);
+                        html += `
+                            <div class="record-item">
+                                <span>${this.getModeName(mode)}</span>
+                                <span>${this.formatTime(record.time)} (错误:${record.errors} 提示:${record.hints} +${penaltyMinutes}分)</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (html === '') {
+                    html = '<p>暂无记录</p>';
+                }
+
+                listDiv.innerHTML = html;
+            }
+
+            // 获取指定模式的提示惩罚
+            getHintPenaltyForMode(mode) {
+                const penalties = {
+                    'easy': 1,
+                    'medium': 3,
+                    'hard': 5,
+                    'master': 10
+                };
+                return penalties[mode] || 0;
+            }
+        }
+
+        // 启动游戏
+        document.addEventListener('DOMContentLoaded', () => {
+            window.game = new SudokuGame();
+        });
+    </script>
+</body>
+</html>
