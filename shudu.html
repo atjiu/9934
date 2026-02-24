@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -41,7 +42,7 @@
             background: var(--bg-color, white);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             transition: background-color 0.3s ease;
         }
 
@@ -70,7 +71,7 @@
             --btn-pause: #2196F3;
             --btn-rest: #795548;
             --message-bg: #ffffff;
-            --toast-bg: rgba(0,0,0,0.8);
+            --toast-bg: rgba(0, 0, 0, 0.8);
             --toast-text: #ffffff;
         }
 
@@ -91,7 +92,7 @@
                 --user-number: #64b5f6;
                 --error-number: #ff8a80;
                 --message-bg: #2d2d2d;
-                --toast-bg: rgba(255,255,255,0.9);
+                --toast-bg: rgba(255, 255, 255, 0.9);
                 --toast-text: #333333;
             }
         }
@@ -101,7 +102,7 @@
             color: var(--text-color);
             margin-bottom: 15px;
             font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* 游戏信息栏 */
@@ -134,7 +135,7 @@
             background: var(--bg-color);
             padding: 4px 12px;
             border-radius: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .errors {
@@ -147,7 +148,7 @@
             background: var(--bg-color);
             padding: 4px 12px;
             border-radius: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .hint-count {
@@ -160,7 +161,7 @@
             background: var(--bg-color);
             padding: 4px 12px;
             border-radius: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         /* 模式选择 */
@@ -182,16 +183,27 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             flex: 1;
             min-width: 70px;
             color: white;
         }
 
-        .mode-btn.easy { background: var(--mode-easy); }
-        .mode-btn.medium { background: var(--mode-medium); }
-        .mode-btn.hard { background: var(--mode-hard); }
-        .mode-btn.master { background: var(--mode-master); }
+        .mode-btn.easy {
+            background: var(--mode-easy);
+        }
+
+        .mode-btn.medium {
+            background: var(--mode-medium);
+        }
+
+        .mode-btn.hard {
+            background: var(--mode-hard);
+        }
+
+        .mode-btn.master {
+            background: var(--mode-master);
+        }
 
         .mode-btn:hover {
             transform: translateY(-2px);
@@ -200,7 +212,7 @@
 
         .mode-btn.active {
             transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
             border: 2px solid white;
         }
 
@@ -316,7 +328,7 @@
             position: absolute;
             background: var(--bg-color);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 15px;
             z-index: 100;
             display: grid;
@@ -332,6 +344,7 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -374,7 +387,7 @@
             font-size: 16px;
             font-weight: bold;
             z-index: 2000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             animation: toastFadeIn 0.3s ease;
             max-width: 80%;
             text-align: center;
@@ -386,6 +399,7 @@
                 opacity: 0;
                 transform: translate(-50%, 20%);
             }
+
             to {
                 opacity: 1;
                 transform: translate(-50%, -50%);
@@ -431,17 +445,31 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             flex: 1;
             min-width: 80px;
             color: white;
         }
 
-        .btn-reset { background: var(--btn-reset); }
-        .btn-clear { background: var(--btn-clear); }
-        .btn-hint { background: var(--btn-hint); }
-        .btn-pause { background: var(--btn-pause); }
-        .btn-rest { background: var(--btn-rest); }
+        .btn-reset {
+            background: var(--btn-reset);
+        }
+
+        .btn-clear {
+            background: var(--btn-clear);
+        }
+
+        .btn-hint {
+            background: var(--btn-hint);
+        }
+
+        .btn-pause {
+            background: var(--btn-pause);
+        }
+
+        .btn-rest {
+            background: var(--btn-rest);
+        }
 
         .btn:hover {
             transform: translateY(-2px);
@@ -456,7 +484,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -474,7 +502,7 @@
             text-align: center;
             max-width: 350px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.3s ease;
             color: var(--text-color);
         }
@@ -484,6 +512,7 @@
                 transform: translateY(-50px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -567,17 +596,48 @@
 
         /* 移动端优化 */
         @media (max-width: 480px) {
-            .sudoku-container { padding: 15px; }
-            .game-info { font-size: 12px; }
-            .mode-btn { padding: 8px 10px; font-size: 12px; min-width: 60px; }
-            .sudoku-cell input { font-size: 18px; }
-            .btn { padding: 8px 12px; font-size: 12px; min-width: 70px; }
-            .number-picker { width: 180px; padding: 12px; gap: 8px; }
-            .number-picker button { font-size: 20px; }
-            .toast { font-size: 14px; padding: 10px 20px; }
+            .sudoku-container {
+                padding: 15px;
+            }
+
+            .game-info {
+                font-size: 12px;
+            }
+
+            .mode-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+
+            .sudoku-cell input {
+                font-size: 18px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 70px;
+            }
+
+            .number-picker {
+                width: 180px;
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .number-picker button {
+                font-size: 20px;
+            }
+
+            .toast {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -588,54 +648,119 @@
         class SudokuGenerator {
             generateFullSolution() {
                 const board = Array(9).fill().map(() => Array(9).fill(0));
-                this.solve(board);
+                this.solve(board, true); // true表示随机模式
                 return board.map(row => [...row]);
             }
 
-            solve(board) {
+            solve(board, random = false) {
                 const empty = this.findEmpty(board);
                 if (!empty) return true;
 
                 const { row, col } = empty;
-                const numbers = this.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                if (random) numbers = this.shuffle(numbers);
 
                 for (const num of numbers) {
                     if (this.isValid(board, row, col, num)) {
                         board[row][col] = num;
-                        if (this.solve(board)) return true;
+                        if (this.solve(board, random)) return true;
                         board[row][col] = 0;
                     }
                 }
                 return false;
             }
 
+            // 唯一解检测器 (不随机，按顺序尝试，找到第一个解即返回)
+            solveUnique(board) {
+                const empty = this.findEmpty(board);
+                if (!empty) return true;
+
+                const { row, col } = empty;
+                for (let num = 1; num <= 9; num++) {
+                    if (this.isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (this.solveUnique(board)) return true;
+                        board[row][col] = 0;
+                    }
+                }
+                return false;
+            }
+
+            // 计算当前盘面的解的数量 (用于唯一性验证)
+            countSolutions(board, limit = 2) {
+                const empty = this.findEmpty(board);
+                if (!empty) return 1; // 没有空格，是一个解
+
+                const { row, col } = empty;
+                let count = 0;
+                for (let num = 1; num <= 9; num++) {
+                    if (this.isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        count += this.countSolutions(board, limit);
+                        board[row][col] = 0;
+                        if (count >= limit) break; // 超过限制提前结束
+                    }
+                }
+                return count;
+            }
+
             generatePuzzle(difficulty) {
+                // 1. 生成完整终盘
                 const solution = this.generateFullSolution();
 
-                let cellsToRemove;
-                switch(difficulty) {
-                    case 'easy': cellsToRemove = 35; break;
-                    case 'medium': cellsToRemove = 45; break;
-                    case 'hard': cellsToRemove = 50; break;
-                    case 'master': cellsToRemove = 55; break;
-                    default: cellsToRemove = 40;
+                // 2. 根据难度确定目标空格数
+                let targetEmpty;
+                switch (difficulty) {
+                    case 'easy': targetEmpty = 35; break;   // 保留46数字
+                    case 'medium': targetEmpty = 45; break;  // 保留36数字
+                    case 'hard': targetEmpty = 52; break;    // 保留29数字
+                    case 'master': targetEmpty = 58; break;  // 保留23数字
+                    default: targetEmpty = 40;
                 }
 
+                // 3. 复制一份作为题目雏形
                 const puzzle = solution.map(row => [...row]);
-                const positions = [];
 
+                // 4. 获取所有位置并随机打乱
+                const positions = [];
                 for (let i = 0; i < 9; i++) {
                     for (let j = 0; j < 9; j++) {
                         positions.push([i, j]);
                     }
                 }
-
                 this.shuffle(positions);
 
-                for (let k = 0; k < cellsToRemove; k++) {
-                    const [i, j] = positions[k];
+                // 5. 尝试挖空，每挖一个空就检查唯一性
+                let removed = 0;
+                for (const [i, j] of positions) {
+                    if (removed >= targetEmpty) break;
+
+                    const original = puzzle[i][j];
+                    if (original === 0) continue; // 已经挖空
+
+                    // 临时移除该数字
                     puzzle[i][j] = 0;
+
+                    // 克隆当前盘面用于唯一性检测
+                    const testBoard = puzzle.map(row => [...row]);
+
+                    // 计算解的数量 (超过1即多解)
+                    const solutions = this.countSolutions(testBoard, 2);
+
+                    if (solutions === 1) {
+                        // 唯一解，可以安全挖掉
+                        removed++;
+                    } else {
+                        // 多解或无解(理论上不会无解)，恢复该格
+                        puzzle[i][j] = original;
+                    }
+
+                    // 进度保护：如果已经挖得差不多了，但还有位置未尝试，继续
                 }
+
+                // 6. 如果挖空数量未达标，但已经无法继续(所有剩余格子挖掉都会导致多解)，
+                //    就接受当前结果。这样保证了唯一解，只是可能空格略少。
+                console.log(`实际挖空: ${removed} (目标: ${targetEmpty})`);
 
                 return { puzzle, solution };
             }
@@ -658,23 +783,22 @@
             }
 
             isValid(board, row, col, num) {
+                // 检查行
                 for (let j = 0; j < 9; j++) {
                     if (board[row][j] === num) return false;
                 }
-
+                // 检查列
                 for (let i = 0; i < 9; i++) {
                     if (board[i][col] === num) return false;
                 }
-
+                // 检查宫
                 const startRow = Math.floor(row / 3) * 3;
                 const startCol = Math.floor(col / 3) * 3;
-
                 for (let i = startRow; i < startRow + 3; i++) {
                     for (let j = startCol; j < startCol + 3; j++) {
                         if (board[i][j] === num) return false;
                     }
                 }
-
                 return true;
             }
         }
@@ -1312,4 +1436,5 @@
 
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </body>
+
 </html>
