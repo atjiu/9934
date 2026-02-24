@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -115,7 +116,8 @@
             border-radius: 16px;
             padding: 8px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-            touch-action: none; /* 防止触摸时页面滚动 */
+            touch-action: none;
+            /* 防止触摸时页面滚动 */
         }
 
         canvas {
@@ -124,7 +126,8 @@
             aspect-ratio: 600/800;
             background: #0a1118;
             border-radius: 8px;
-            touch-action: none; /* 防止触摸时页面滚动 */
+            touch-action: none;
+            /* 防止触摸时页面滚动 */
         }
 
         /* 右侧信息区 */
@@ -230,11 +233,25 @@
             cursor: not-allowed;
         }
 
-        .btn-primary { background: var(--btn-primary); }
-        .btn-success { background: var(--btn-success); }
-        .btn-warning { background: var(--btn-warning); }
-        .btn-danger { background: var(--btn-danger); }
-        .btn-secondary { background: var(--btn-secondary); }
+        .btn-primary {
+            background: var(--btn-primary);
+        }
+
+        .btn-success {
+            background: var(--btn-success);
+        }
+
+        .btn-warning {
+            background: var(--btn-warning);
+        }
+
+        .btn-danger {
+            background: var(--btn-danger);
+        }
+
+        .btn-secondary {
+            background: var(--btn-secondary);
+        }
 
         .modal {
             display: none;
@@ -271,6 +288,7 @@
                 transform: translateY(40px);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0);
                 opacity: 1;
@@ -303,10 +321,25 @@
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, 20%); }
-            15% { opacity: 1; transform: translate(-50%, -50%); }
-            85% { opacity: 1; transform: translate(-50%, -50%); }
-            100% { opacity: 0; transform: translate(-50%, -80%); }
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 20%);
+            }
+
+            15% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+
+            85% {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -80%);
+            }
         }
 
         .instructions {
@@ -357,6 +390,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
@@ -671,32 +705,32 @@
                 const centerY = brick.y + brick.height / 2;
                 const size = Math.min(brick.width, brick.height) * 0.7;
 
-                switch(brick.shape) {
+                switch (brick.shape) {
                     case 'square':
-                        ctx.fillRect(centerX - size/2, centerY - size/2, size, size);
+                        ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
                         break;
 
                     case 'circle':
                         ctx.beginPath();
-                        ctx.arc(centerX, centerY, size/2, 0, Math.PI * 2);
+                        ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
                         ctx.fill();
                         break;
 
                     case 'triangle':
                         ctx.beginPath();
-                        ctx.moveTo(centerX, centerY - size/2);
-                        ctx.lineTo(centerX + size/2, centerY + size/2);
-                        ctx.lineTo(centerX - size/2, centerY + size/2);
+                        ctx.moveTo(centerX, centerY - size / 2);
+                        ctx.lineTo(centerX + size / 2, centerY + size / 2);
+                        ctx.lineTo(centerX - size / 2, centerY + size / 2);
                         ctx.closePath();
                         ctx.fill();
                         break;
 
                     case 'diamond':
                         ctx.beginPath();
-                        ctx.moveTo(centerX, centerY - size/2);
-                        ctx.lineTo(centerX + size/2, centerY);
-                        ctx.lineTo(centerX, centerY + size/2);
-                        ctx.lineTo(centerX - size/2, centerY);
+                        ctx.moveTo(centerX, centerY - size / 2);
+                        ctx.lineTo(centerX + size / 2, centerY);
+                        ctx.lineTo(centerX, centerY + size / 2);
+                        ctx.lineTo(centerX - size / 2, centerY);
                         ctx.closePath();
                         ctx.fill();
                         break;
@@ -705,8 +739,8 @@
                         ctx.beginPath();
                         for (let i = 0; i < 5; i++) {
                             const angle = (i * 72 - 90) * Math.PI / 180;
-                            const x = centerX + size/2 * Math.cos(angle);
-                            const y = centerY + size/2 * Math.sin(angle);
+                            const x = centerX + size / 2 * Math.cos(angle);
+                            const y = centerY + size / 2 * Math.sin(angle);
                             if (i === 0) ctx.moveTo(x, y);
                             else ctx.lineTo(x, y);
                         }
@@ -718,8 +752,8 @@
                         ctx.beginPath();
                         for (let i = 0; i < 6; i++) {
                             const angle = i * 60 * Math.PI / 180;
-                            const x = centerX + size/2 * Math.cos(angle);
-                            const y = centerY + size/2 * Math.sin(angle);
+                            const x = centerX + size / 2 * Math.cos(angle);
+                            const y = centerY + size / 2 * Math.sin(angle);
                             if (i === 0) ctx.moveTo(x, y);
                             else ctx.lineTo(x, y);
                         }
@@ -730,7 +764,7 @@
                     case 'star':
                         ctx.beginPath();
                         for (let i = 0; i < 10; i++) {
-                            const radius = i % 2 === 0 ? size/2 : size/4;
+                            const radius = i % 2 === 0 ? size / 2 : size / 4;
                             const angle = (i * 36 - 90) * Math.PI / 180;
                             const x = centerX + radius * Math.cos(angle);
                             const y = centerY + radius * Math.sin(angle);
@@ -815,14 +849,14 @@
                     ctx.fillStyle = 'white';
                     ctx.font = 'bold 40px Arial';
                     ctx.textAlign = 'center';
-                    ctx.fillText('⏸️ 暂停', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+                    ctx.fillText('⏸️ 暂停', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
                 }
 
                 ctx.shadowBlur = 0;
             }, [drawShape, isPaused]);
 
             // 添加 roundRect 方法
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                 if (w < 2 * r) r = w / 2;
                 if (h < 2 * r) r = h / 2;
                 this.moveTo(x + r, y);
@@ -1062,13 +1096,17 @@
 
                     // 计算触摸位置相对于画布的X坐标
                     let touchX = (touch.clientX - rect.left) * scaleX;
-                    // 限制在板子宽度范围内
-                    touchX = Math.max(0, Math.min(touchX, CANVAS_WIDTH - gameStateRef.current.paddle.width));
 
-                    gameStateRef.current.paddle.x = touchX;
+                    // 调整：让横板的中心对准触摸位置
+                    const paddleWidth = gameStateRef.current.paddle.width;
+                    let newPaddleX = touchX - paddleWidth / 2;
+
+                    // 限制在板子宽度范围内
+                    newPaddleX = Math.max(0, Math.min(newPaddleX, CANVAS_WIDTH - paddleWidth));
+
+                    gameStateRef.current.paddle.x = newPaddleX;
                     drawGame();
                 };
-
                 const canvas = canvasRef.current;
                 if (canvas) {
                     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -1096,10 +1134,18 @@
                     const rect = canvas.getBoundingClientRect();
                     const scaleX = canvas.width / rect.width;
 
+                    // 计算鼠标位置相对于画布的X坐标
                     let mouseX = (e.clientX - rect.left) * scaleX;
-                    mouseX = Math.max(0, Math.min(mouseX, CANVAS_WIDTH - gameStateRef.current.paddle.width));
 
-                    gameStateRef.current.paddle.x = mouseX;
+                    // 调整：让横板的中心对准鼠标位置，而不是左边
+                    // 横板中心应该在鼠标位置，所以横板左边位置 = 鼠标X - 横板宽度/2
+                    const paddleWidth = gameStateRef.current.paddle.width;
+                    let newPaddleX = mouseX - paddleWidth / 2;
+
+                    // 限制横板在画布范围内
+                    newPaddleX = Math.max(0, Math.min(newPaddleX, CANVAS_WIDTH - paddleWidth));
+
+                    gameStateRef.current.paddle.x = newPaddleX;
                     drawGame();
                 };
 
@@ -1160,8 +1206,10 @@
                                 <div className="level-progress">
                                     <div
                                         className="progress-bar"
-                                        style={{ width: `${gameStateRef.current.bricks.length ?
-                                            ((gameStateRef.current.bricks.length - bricksRemaining) / gameStateRef.current.bricks.length) * 100 : 0}%` }}
+                                        style={{
+                                            width: `${gameStateRef.current.bricks.length ?
+                                                ((gameStateRef.current.bricks.length - bricksRemaining) / gameStateRef.current.bricks.length) * 100 : 0}%`
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -1222,14 +1270,14 @@
 
                             <div className="record-card">
                                 <p><strong>本次成绩</strong><br />
-                                   等级 {level} · 得分 {score}<br />
-                                   时间 {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
-                                   {String(elapsedSeconds % 60).padStart(2, '0')}
+                                    等级 {level} · 得分 {score}<br />
+                                    时间 {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
+                                    {String(elapsedSeconds % 60).padStart(2, '0')}
                                 </p>
                                 <p><strong>🏆 历史最佳</strong><br />
-                                   等级 {bestRecord.level} · 得分 {bestRecord.score}<br />
-                                   时间 {String(Math.floor(bestRecord.time / 60)).padStart(2, '0')}:
-                                   {String(bestRecord.time % 60).padStart(2, '0')}
+                                    等级 {bestRecord.level} · 得分 {bestRecord.score}<br />
+                                    时间 {String(Math.floor(bestRecord.time / 60)).padStart(2, '0')}:
+                                    {String(bestRecord.time % 60).padStart(2, '0')}
                                 </p>
                             </div>
 
@@ -1249,4 +1297,5 @@
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
+
 </html>

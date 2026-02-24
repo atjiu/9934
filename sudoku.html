@@ -61,15 +61,6 @@
             --initial-number: #000000;
             --user-number: #2196F3;
             --error-number: #f44336;
-            --mode-easy: #4CAF50;
-            --mode-medium: #FF9800;
-            --mode-hard: #f44336;
-            --mode-master: #9C27B0;
-            --btn-reset: #9C27B0;
-            --btn-clear: #607D8B;
-            --btn-hint: #FF9800;
-            --btn-pause: #2196F3;
-            --btn-rest: #795548;
             --message-bg: #ffffff;
             --toast-bg: rgba(0, 0, 0, 0.8);
             --toast-text: #ffffff;
@@ -164,56 +155,88 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* 模式选择 */
+        /* 模式选择 - 俄罗斯方块风格 */
         .mode-selector {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         .mode-btn {
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 12px 15px;
             border: none;
-            border-radius: 50px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            min-width: 70px;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.08s linear;
             color: white;
+            flex: 1 0 80px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+            position: relative;
+            top: 0;
+        }
+
+        .mode-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
         .mode-btn.easy {
-            background: var(--mode-easy);
+            background: #4CAF50;
         }
 
         .mode-btn.medium {
-            background: var(--mode-medium);
+            background: #FF9800;
         }
 
         .mode-btn.hard {
-            background: var(--mode-hard);
+            background: #f44336;
         }
 
         .mode-btn.master {
-            background: var(--mode-master);
+            background: #9C27B0;
         }
 
-        .mode-btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
+
+        .mode-btn.easy.active {
+            background: #2e7d32;
+            box-shadow: 0 2px 0 #1b5e20,
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .mode-btn.medium.active {
+            background: #f57c00;
+            box-shadow: 0 2px 0 #ef6c00,
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .mode-btn.hard.active {
+            background: #d32f2f;
+            box-shadow: 0 2px 0 #b71c1c,
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .mode-btn.master.active {
+            background: #7b1fa2;
+            box-shadow: 0 2px 0 #6a1b9a,
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
         .mode-btn.active {
-            transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            filter: brightness(1.2);
             border: 2px solid white;
+            top: 2px;
         }
 
         /* 数独网格容器 */
@@ -426,54 +449,112 @@
             color: #0c5460;
         }
 
-        /* 按钮组 */
+        /* 按钮组 - 俄罗斯方块风格 */
         .button-container {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 12px 18px;
             border: none;
-            border-radius: 50px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            flex: 1;
-            min-width: 80px;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.08s linear;
             color: white;
+            flex: 1 0 80px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            transform: none;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
         }
 
         .btn-reset {
-            background: var(--btn-reset);
+            background: #9C27B0;
         }
 
         .btn-clear {
-            background: var(--btn-clear);
+            background: #607D8B;
         }
 
         .btn-hint {
-            background: var(--btn-hint);
+            background: #FF9800;
         }
 
         .btn-pause {
-            background: var(--btn-pause);
+            background: #2196F3;
         }
 
         .btn-rest {
-            background: var(--btn-rest);
+            background: #795548;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
+        /* 暂停面板按钮 */
+        .btn-resume {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.08s linear;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-resume:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 完成/下一局按钮 */
+        .btn-next {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.08s linear;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
+        }
+
+        .btn-next:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3);
         }
 
         /* 模态框 */
@@ -544,14 +625,6 @@
             color: #856404;
         }
 
-        .btn-next {
-            background: #4CAF50;
-            color: white;
-            padding: 12px 30px;
-            font-size: 16px;
-            margin-top: 15px;
-        }
-
         /* 暂停面板 */
         .pause-modal-content h2 {
             color: #2196F3;
@@ -562,12 +635,6 @@
             gap: 15px;
             justify-content: center;
             margin-top: 20px;
-        }
-
-        .btn-resume {
-            background: #4CAF50;
-            color: white;
-            padding: 12px 30px;
         }
 
         /* 游戏结束面板 */
@@ -605,7 +672,7 @@
             }
 
             .mode-btn {
-                padding: 8px 10px;
+                padding: 10px 12px;
                 font-size: 12px;
                 min-width: 60px;
             }
@@ -615,7 +682,7 @@
             }
 
             .btn {
-                padding: 8px 12px;
+                padding: 10px 12px;
                 font-size: 12px;
                 min-width: 70px;
             }
@@ -992,6 +1059,7 @@
             }, [showToast]);
 
             // 设置单元格值
+            // 设置单元格值
             const setCellValue = useCallback((row, col, num) => {
                 if (!gameActive || isPaused) return;
                 if (initialBoard[row][col]) return;
@@ -1006,6 +1074,7 @@
                         return newBoard;
                     });
 
+                    // 如果这个格子之前有错误记录，清除它
                     if (errorInputsRef.current.has(key)) {
                         errorInputsRef.current.delete(key);
                     }
@@ -1021,27 +1090,32 @@
                         }
                     }, 100);
                 } else {
-                    // 错误输入
-                    if (!errorInputsRef.current.has(key)) {
-                        errorInputsRef.current.add(key);
-                        setErrorCount(prev => {
-                            const newCount = prev + 1;
-                            showToast(`错误！还剩 ${maxErrors - newCount} 次机会`, 'warning');
+                    // 错误输入 - 修复：无论是否重复错误，都增加计数
+                    // 先记录这次错误（即使格子已有错误标记）
 
-                            if (newCount >= maxErrors) {
-                                gameOver();
-                            }
-                            return newCount;
-                        });
-                    }
-
-                    // 显示错误，1秒后清除
+                    // 记录这次错误的数字（用于1秒后清除显示）
                     setUserBoard(prev => {
                         const newBoard = [...prev];
                         newBoard[row][col] = num;
                         return newBoard;
                     });
 
+                    // 无论是否重复错误，都增加错误计数
+                    setErrorCount(prev => {
+                        const newCount = prev + 1;
+                        showToast(`错误！还剩 ${maxErrors - newCount} 次机会`, 'warning');
+
+                        if (newCount >= maxErrors) {
+                            gameOver();
+                        }
+                        return newCount;
+                    });
+
+                    // 将错误格子添加到ref集合中（用于标记这是一个曾经出错的格子）
+                    // 但不再用这个集合来控制错误计数
+                    errorInputsRef.current.add(key);
+
+                    // 1秒后清除错误显示
                     setTimeout(() => {
                         setUserBoard(prev => {
                             const newBoard = [...prev];
@@ -1134,28 +1208,40 @@
             const giveHint = useCallback(() => {
                 if (!gameActive || isPaused) return;
 
-                for (let i = 0; i < 9; i++) {
-                    for (let j = 0; j < 9; j++) {
-                        if (!initialBoard[i][j] && userBoard[i][j] === 0) {
-                            setCellValue(i, j, solution[i][j]);
-                            setHintCount(prev => prev + 1);
+                // 如果有选中的格子
+                if (selectedRow !== null && selectedCol !== null) {
+                    const row = selectedRow;
+                    const col = selectedCol;
 
-                            const penaltySeconds = getHintPenalty() * 60;
-                            setElapsedSeconds(prev => prev + penaltySeconds);
+                    // 检查是否是空白格子（既不是初始数字，也没有用户输入）
+                    if (!initialBoard[row][col] && userBoard[row][col] === 0) {
+                        // 填入正确数字
+                        setCellValue(row, col, solution[row][col]);
+                        setHintCount(prev => prev + 1);
 
-                            if (startTimeRef.current) {
-                                startTimeRef.current -= penaltySeconds * 1000;
-                            }
+                        const penaltySeconds = getHintPenalty() * 60;
+                        setElapsedSeconds(prev => prev + penaltySeconds);
 
-                            showToast(`已填入一个正确数字 (惩罚+${getHintPenalty()}分钟)`, 'info');
-                            setShowPicker(false);
-                            return;
+                        if (startTimeRef.current) {
+                            startTimeRef.current -= penaltySeconds * 1000;
                         }
+
+                        showToast(`已填入一个正确数字 (惩罚+${getHintPenalty()}分钟)`, 'info');
+                        setShowPicker(false);
+                        return;
+                    } else {
+                        // 选中的格子不是空白格子
+                        showToast('请先选择一个空白格子', 'warning');
+                        return;
                     }
+                } else {
+                    // 没有选中任何格子
+                    showToast('请先点击选择一个空白格子', 'warning');
+                    return;
                 }
 
-                showToast('没有可提示的空格了', 'info');
-            }, [gameActive, isPaused, initialBoard, userBoard, solution, setCellValue, getHintPenalty, showToast]);
+                // 移除原来的自动查找逻辑
+            }, [gameActive, isPaused, selectedRow, selectedCol, initialBoard, userBoard, solution, setCellValue, getHintPenalty, showToast]);
 
             // 暂停/恢复
             const togglePause = useCallback(() => {
@@ -1187,7 +1273,13 @@
                 setSelectedCol(null);
                 errorInputsRef.current.clear();
 
+                // 清空所有格子（包括题目和玩家输入）
                 setBoard(Array(9).fill().map(() => Array(9).fill(0)));
+                // 同时清空用户输入
+                setUserBoard(Array(9).fill().map(() => Array(9).fill(0)));
+                // 清空初始题目标记
+                setInitialBoard(Array(9).fill().map(() => Array(9).fill(false)));
+
                 showToast('已休息，选择难度开始新游戏', 'info');
             }, [showToast]);
 
@@ -1433,8 +1525,6 @@
         // 渲染应用
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
-
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </body>
 
 </html>
