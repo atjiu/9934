@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>弹球大冒险 - 打砖块</title>
+    <script crossorigin src="./assets/js/react.development.js"></script>
+    <script crossorigin src="./assets/js/react-dom.development.js"></script>
+    <script src="./assets/js/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2b3a4a 0%, #1d2b36 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            transition: background 0.3s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #0b1a2a 0%, #0e1a1f 100%);
+            }
+        }
+
+        #root {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --info-bg: #ecf0f1;
+            --border-color: #b0bec5;
+            --panel-bg: #f8f9fa;
+            --game-bg: #1a2632;
+            --paddle-color: #3498db;
+            --ball-color: #e74c3c;
+            --btn-primary: #3498db;
+            --btn-success: #2ecc71;
+            --btn-warning: #f39c12;
+            --btn-danger: #e74c3c;
+            --btn-secondary: #95a5a6;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --toast-bg: rgba(0, 0, 0, 0.8);
+            --toast-text: white;
+            --message-bg: white;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1e2b38;
+                --text-color: #e0e0e0;
+                --info-bg: #2c3e50;
+                --border-color: #4a5b6b;
+                --panel-bg: #263238;
+                --game-bg: #0f1a24;
+                --paddle-color: #5faee3;
+                --ball-color: #ff6b6b;
+                --btn-primary: #2980b9;
+                --btn-success: #27ae60;
+                --btn-warning: #e67e22;
+                --btn-danger: #c0392b;
+                --btn-secondary: #7f8c8d;
+                --shadow-color: rgba(0, 0, 0, 0.5);
+                --toast-bg: rgba(255, 255, 255, 0.9);
+                --toast-text: #2c3e50;
+                --message-bg: #34495e;
+            }
+        }
+
+        .tetris-container {
+            background: var(--bg-color);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 20px 40px var(--shadow-color);
+            transition: background 0.3s, color 0.3s;
+            color: var(--text-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 12px 0;
+            font-weight: 400;
+            font-size: 1.8em;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px var(--shadow-color);
+        }
+
+        .game-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* 主游戏区 - 竖屏 */
+        .play-area {
+            flex: 2;
+            min-width: 280px;
+        }
+
+        .canvas-container {
+            background: var(--game-bg);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            touch-action: none; /* 防止触摸时页面滚动 */
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            aspect-ratio: 600/800;
+            background: #0a1118;
+            border-radius: 8px;
+            touch-action: none; /* 防止触摸时页面滚动 */
+        }
+
+        /* 右侧信息区 */
+        .info-area {
+            flex: 1;
+            min-width: 180px;
+            background: var(--info-bg);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: inset 0 2px 6px var(--shadow-color);
+        }
+
+        .stat-item {
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .level-info {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 6px;
+            color: var(--btn-primary);
+        }
+
+        .next-piece {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .next-title {
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .level-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--btn-success);
+            transition: width 0.3s;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.08s linear;
+            color: white;
+            flex: 1 0 80px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            transform: none;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+        }
+
+        .btn-primary { background: var(--btn-primary); }
+        .btn-success { background: var(--btn-success); }
+        .btn-warning { background: var(--btn-warning); }
+        .btn-danger { background: var(--btn-danger); }
+        .btn-secondary { background: var(--btn-secondary); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--message-bg);
+            color: var(--text-color);
+            padding: 24px 20px;
+            border-radius: 30px;
+            max-width: 300px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 30px 60px var(--shadow-color);
+            animation: slideUp 0.3s;
+            border: 2px solid var(--border-color);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .record-card {
+            background: var(--info-bg);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 14px;
+            z-index: 2000;
+            box-shadow: 0 8px 20px black;
+            animation: fadeInOut 2s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20%); }
+            15% { opacity: 1; transform: translate(-50%, -50%); }
+            85% { opacity: 1; transform: translate(-50%, -50%); }
+            100% { opacity: 0; transform: translate(-50%, -80%); }
+        }
+
+        .instructions {
+            margin-top: 16px;
+            font-size: 12px;
+            background: var(--info-bg);
+            padding: 10px;
+            border-radius: 16px;
+            opacity: 0.8;
+        }
+
+        .key-hint {
+            display: inline-block;
+            background: var(--panel-bg);
+            padding: 3px 6px;
+            border-radius: 6px;
+            margin: 0 2px;
+            font-weight: 600;
+            font-size: 11px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 600px) {
+            .game-panel {
+                flex-direction: column;
+            }
+
+            .info-area {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .stat-item {
+                flex: 1;
+                min-width: 80px;
+                padding: 8px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .btn {
+                padding: 12px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useRef } = React;
+
+        // 游戏常量 - 竖屏比例
+        const CANVAS_WIDTH = 600;
+        const CANVAS_HEIGHT = 800;
+        const PADDLE_HEIGHT = 15;
+        const BALL_RADIUS = 8;
+
+        // 障碍物形状
+        const BRICK_SHAPES = [
+            'square',       // 正方形
+            'circle',       // 圆形
+            'triangle',     // 三角形
+            'diamond',      // 菱形
+            'pentagon',     // 五边形
+            'hexagon',      // 六边形
+            'star'          // 星形
+        ];
+
+        // 颜色池
+        const COLOR_PALETTE = [
+            '#00e5f0', '#2dd4bf', '#14b8a6', '#0d9488', '#0891b2',
+            '#f0e43b', '#fbbf24', '#f59e0b', '#d97706', '#b45309',
+            '#c158f0', '#a855f7', '#9333ea', '#7e22ce', '#6b21a8',
+            '#5cd65c', '#4ade80', '#22c55e', '#16a34a', '#15803d',
+            '#f55c5c', '#f87171', '#ef4444', '#dc2626', '#b91c1c',
+            '#f0a64a', '#fb923c', '#f97316', '#ea580c', '#c2410c',
+            '#4aa0f0', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8',
+            '#ec4899', '#db2777', '#be185d', '#9d174d',
+            '#a78bfa', '#8b5cf6', '#7c3aed', '#6d28d9', '#5b21b6'
+        ];
+
+        // 键盘控制常量
+        const KEY_SPEED = 15;
+
+        function App() {
+            // 游戏状态
+            const [gameActive, setGameActive] = useState(false);
+            const [isPaused, setIsPaused] = useState(false);
+            const [gameOver, setGameOver] = useState(false);
+            const [showGameOverModal, setShowGameOverModal] = useState(false);
+            const [showPauseModal, setShowPauseModal] = useState(false);
+            const [toast, setToast] = useState({ show: false, msg: '' });
+
+            // 游戏数据
+            const [level, setLevel] = useState(1);
+            const [score, setScore] = useState(0);
+            const [elapsedSeconds, setElapsedSeconds] = useState(0);
+            const [bricksRemaining, setBricksRemaining] = useState(0);
+
+            // 历史最佳
+            const [bestRecord, setBestRecord] = useState(() => {
+                const saved = localStorage.getItem('brickbreaker_best');
+                return saved ? JSON.parse(saved) : { level: 1, score: 0, time: 0 };
+            });
+
+            // 游戏对象引用
+            const canvasRef = useRef(null);
+            const animationRef = useRef(null);
+            const timerRef = useRef(null);
+            const startTimeRef = useRef(null);
+
+            // 键盘控制
+            const keyStateRef = useRef({
+                left: false,
+                right: false
+            });
+
+            // 游戏状态引用
+            const gameStateRef = useRef({
+                paddle: {
+                    x: CANVAS_WIDTH / 2 - 60,
+                    width: 120,
+                },
+                ball: null,
+                bricks: [],
+                velocity: { x: 0, y: 0 },
+                baseSpeed: 3.5,
+                level: 1,
+                score: 0,
+                gameActive: false
+            });
+
+            // 显示提示
+            const showToastMsg = useCallback((msg) => {
+                setToast({ show: true, msg });
+                setTimeout(() => setToast({ show: false, msg: '' }), 2000);
+            }, []);
+
+            // 根据等级获取横板宽度和基础球速
+            const getLevelConfig = useCallback((level) => {
+                const width = Math.max(60, 140 - level * 6); // 等级越高板越短
+                const baseSpeed = Math.min(9, 3 + level * 0.6); // 等级越高速度越快
+                return { paddleWidth: width, baseSpeed };
+            }, []);
+
+            // 获取随机形状
+            const getRandomShape = useCallback(() => {
+                return BRICK_SHAPES[Math.floor(Math.random() * BRICK_SHAPES.length)];
+            }, []);
+
+            // 生成随机障碍物 - 等级越高障碍越多
+            const generateBricks = useCallback((level, shape) => {
+                const bricks = [];
+                // 等级越高，行数和列数越多
+                const rows = 5 + Math.floor(level * 1.2);
+                const cols = 4 + Math.floor(level * 0.8);
+                // 限制最大行列数，避免太拥挤
+                const maxRows = 10;
+                const maxCols = 7;
+                const actualRows = Math.min(rows, maxRows);
+                const actualCols = Math.min(cols, maxCols);
+
+                const brickWidth = 80;
+                const brickHeight = 28;
+                const startX = (CANVAS_WIDTH - actualCols * brickWidth) / 2;
+                const startY = 50;
+
+                for (let row = 0; row < actualRows; row++) {
+                    for (let col = 0; col < actualCols; col++) {
+                        // 等级越高，生成概率越高
+                        const probability = Math.min(0.9, 0.6 + level * 0.03);
+                        if (Math.random() < probability) {
+                            const color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+
+                            bricks.push({
+                                x: startX + col * brickWidth + 4,
+                                y: startY + row * (brickHeight + 6),
+                                width: brickWidth - 8,
+                                height: brickHeight,
+                                shape: shape,
+                                color: color,
+                                active: true,
+                                points: 10 * level
+                            });
+                        }
+                    }
+                }
+                return bricks;
+            }, []);
+
+            // 初始化游戏
+            const startNewGame = useCallback(() => {
+                const shape = getRandomShape();
+                const config = getLevelConfig(1);
+                const bricks = generateBricks(1, shape);
+
+                // 计算随机发射角度 (-45度到45度之间)
+                const angle = (Math.random() * 80 - 40) * Math.PI / 180;
+
+                gameStateRef.current = {
+                    paddle: {
+                        x: CANVAS_WIDTH / 2 - config.paddleWidth / 2,
+                        width: config.paddleWidth,
+                    },
+                    ball: {
+                        x: CANVAS_WIDTH / 2,
+                        y: CANVAS_HEIGHT - 70,
+                        radius: BALL_RADIUS
+                    },
+                    bricks: bricks,
+                    velocity: {
+                        x: Math.sin(angle) * config.baseSpeed,
+                        y: -Math.cos(angle) * config.baseSpeed
+                    },
+                    baseSpeed: config.baseSpeed,
+                    level: 1,
+                    score: 0,
+                    gameActive: true
+                };
+
+                setLevel(1);
+                setScore(0);
+                setBricksRemaining(bricks.filter(b => b.active).length);
+                setElapsedSeconds(0);
+                setGameActive(true);
+                setIsPaused(false);
+                setGameOver(false);
+                setShowGameOverModal(false);
+                setShowPauseModal(false);
+
+                startTimeRef.current = Date.now();
+                showToastMsg('游戏开始！');
+            }, [generateBricks, getLevelConfig, showToastMsg, getRandomShape]);
+
+            // 重置游戏
+            const resetGame = useCallback(() => {
+                setGameActive(false);
+                setIsPaused(false);
+                setGameOver(false);
+                setShowPauseModal(false);
+                setShowGameOverModal(false);
+                setLevel(1);
+                setScore(0);
+                setElapsedSeconds(0);
+
+                const shape = getRandomShape();
+                const config = getLevelConfig(1);
+                const bricks = generateBricks(1, shape);
+
+                gameStateRef.current = {
+                    paddle: {
+                        x: CANVAS_WIDTH / 2 - config.paddleWidth / 2,
+                        width: config.paddleWidth,
+                    },
+                    ball: {
+                        x: CANVAS_WIDTH / 2,
+                        y: CANVAS_HEIGHT - 70,
+                        radius: BALL_RADIUS
+                    },
+                    bricks: bricks,
+                    velocity: { x: 0, y: 0 },
+                    baseSpeed: config.baseSpeed,
+                    level: 1,
+                    score: 0,
+                    gameActive: false
+                };
+
+                setBricksRemaining(bricks.filter(b => b.active).length);
+                drawGame();
+                showToastMsg('游戏已重置');
+            }, [generateBricks, getLevelConfig, showToastMsg, getRandomShape, drawGame]);
+
+            // 暂停游戏
+            const pauseGame = useCallback(() => {
+                if (!gameActive || isPaused) return;
+                setIsPaused(true);
+                setShowPauseModal(true);
+                showToastMsg('游戏暂停');
+            }, [gameActive, isPaused, showToastMsg]);
+
+            // 继续游戏
+            const resumeGame = useCallback(() => {
+                setIsPaused(false);
+                setShowPauseModal(false);
+                showToastMsg('继续游戏');
+            }, [showToastMsg]);
+
+            // 升级到下一关
+            const goToNextLevel = useCallback(() => {
+                const nextLevel = level + 1;
+                const newShape = getRandomShape();
+                const config = getLevelConfig(nextLevel);
+                const bricks = generateBricks(nextLevel, newShape);
+
+                // 保持当前速度方向，但更新速度大小为基础速度
+                const currentVel = gameStateRef.current.velocity;
+                const currentSpeed = Math.sqrt(currentVel.x ** 2 + currentVel.y ** 2);
+
+                let directionX = 0, directionY = -1; // 默认向上
+                if (currentSpeed > 0) {
+                    directionX = currentVel.x / currentSpeed;
+                    directionY = currentVel.y / currentSpeed;
+                }
+
+                gameStateRef.current = {
+                    ...gameStateRef.current,
+                    paddle: {
+                        ...gameStateRef.current.paddle,
+                        width: config.paddleWidth,
+                        x: Math.min(
+                            Math.max(0, gameStateRef.current.paddle.x),
+                            CANVAS_WIDTH - config.paddleWidth
+                        )
+                    },
+                    ball: {
+                        x: CANVAS_WIDTH / 2,
+                        y: CANVAS_HEIGHT - 70,
+                        radius: BALL_RADIUS
+                    },
+                    bricks: bricks,
+                    velocity: {
+                        x: directionX * config.baseSpeed,
+                        y: directionY * config.baseSpeed
+                    },
+                    baseSpeed: config.baseSpeed,
+                    level: nextLevel,
+                    gameActive: true
+                };
+
+                setLevel(nextLevel);
+                setBricksRemaining(bricks.filter(b => b.active).length);
+                showToastMsg(`🎉 进入第 ${nextLevel} 关！速度 ${config.baseSpeed.toFixed(1)}`);
+            }, [level, getLevelConfig, generateBricks, showToastMsg, getRandomShape]);
+
+            // 游戏结束
+            const gameOverHandler = useCallback(() => {
+                setGameActive(false);
+                setGameOver(true);
+                setShowGameOverModal(true);
+
+                // 更新最佳记录
+                if (score > bestRecord.score) {
+                    const newBest = { level, score, time: elapsedSeconds };
+                    setBestRecord(newBest);
+                    localStorage.setItem('brickbreaker_best', JSON.stringify(newBest));
+                    showToastMsg('🏆 新纪录！');
+                }
+            }, [score, level, elapsedSeconds, bestRecord, showToastMsg]);
+
+            // 绘制形状函数
+            const drawShape = useCallback((ctx, brick) => {
+                ctx.fillStyle = brick.color;
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+                ctx.shadowBlur = 8;
+
+                const centerX = brick.x + brick.width / 2;
+                const centerY = brick.y + brick.height / 2;
+                const size = Math.min(brick.width, brick.height) * 0.7;
+
+                switch(brick.shape) {
+                    case 'square':
+                        ctx.fillRect(centerX - size/2, centerY - size/2, size, size);
+                        break;
+
+                    case 'circle':
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, size/2, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+
+                    case 'triangle':
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY - size/2);
+                        ctx.lineTo(centerX + size/2, centerY + size/2);
+                        ctx.lineTo(centerX - size/2, centerY + size/2);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+
+                    case 'diamond':
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY - size/2);
+                        ctx.lineTo(centerX + size/2, centerY);
+                        ctx.lineTo(centerX, centerY + size/2);
+                        ctx.lineTo(centerX - size/2, centerY);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+
+                    case 'pentagon':
+                        ctx.beginPath();
+                        for (let i = 0; i < 5; i++) {
+                            const angle = (i * 72 - 90) * Math.PI / 180;
+                            const x = centerX + size/2 * Math.cos(angle);
+                            const y = centerY + size/2 * Math.sin(angle);
+                            if (i === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+
+                    case 'hexagon':
+                        ctx.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const angle = i * 60 * Math.PI / 180;
+                            const x = centerX + size/2 * Math.cos(angle);
+                            const y = centerY + size/2 * Math.sin(angle);
+                            if (i === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+
+                    case 'star':
+                        ctx.beginPath();
+                        for (let i = 0; i < 10; i++) {
+                            const radius = i % 2 === 0 ? size/2 : size/4;
+                            const angle = (i * 36 - 90) * Math.PI / 180;
+                            const x = centerX + radius * Math.cos(angle);
+                            const y = centerY + radius * Math.sin(angle);
+                            if (i === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                }
+
+                // 添加高光效果
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }, []);
+
+            // 绘制游戏
+            const drawGame = useCallback(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                // 清空画布
+                ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+                const state = gameStateRef.current;
+
+                // 绘制背景网格
+                ctx.strokeStyle = '#1e3a5f';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < CANVAS_WIDTH; i += 30) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#1e3a5f';
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, CANVAS_HEIGHT);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < CANVAS_HEIGHT; i += 30) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#1e3a5f';
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(CANVAS_WIDTH, i);
+                    ctx.stroke();
+                }
+
+                // 绘制障碍物
+                state.bricks.forEach(brick => {
+                    if (!brick.active) return;
+                    drawShape(ctx, brick);
+                });
+
+                // 绘制横板
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = 'rgba(52, 152, 219, 0.5)';
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--paddle-color').trim();
+                ctx.beginPath();
+                ctx.roundRect(state.paddle.x, CANVAS_HEIGHT - PADDLE_HEIGHT - 20, state.paddle.width, PADDLE_HEIGHT, 8);
+                ctx.fill();
+
+                // 绘制弹球
+                if (state.ball) {
+                    ctx.shadowColor = 'rgba(231, 76, 60, 0.5)';
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--ball-color').trim();
+                    ctx.beginPath();
+                    ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 球的高光
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(state.ball.x - 2, state.ball.y - 2, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // 如果暂停，显示暂停文字
+                if (isPaused) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 40px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⏸️ 暂停', CANVAS_WIDTH/2, CANVAS_HEIGHT/2);
+                }
+
+                ctx.shadowBlur = 0;
+            }, [drawShape, isPaused]);
+
+            // 添加 roundRect 方法
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                this.closePath();
+                return this;
+            };
+
+            // 更新游戏逻辑
+            const updateGame = useCallback(() => {
+                const state = gameStateRef.current;
+                if (!state.gameActive || !state.ball || isPaused) return;
+
+                // 键盘控制横板移动
+                if (keyStateRef.current.left) {
+                    state.paddle.x = Math.max(0, state.paddle.x - KEY_SPEED);
+                }
+                if (keyStateRef.current.right) {
+                    state.paddle.x = Math.min(CANVAS_WIDTH - state.paddle.width, state.paddle.x + KEY_SPEED);
+                }
+
+                // 移动球
+                state.ball.x += state.velocity.x;
+                state.ball.y += state.velocity.y;
+
+                // 墙壁碰撞
+                if (state.ball.x - state.ball.radius <= 0) {
+                    state.ball.x = state.ball.radius;
+                    state.velocity.x *= -1;
+                }
+                if (state.ball.x + state.ball.radius >= CANVAS_WIDTH) {
+                    state.ball.x = CANVAS_WIDTH - state.ball.radius;
+                    state.velocity.x *= -1;
+                }
+                if (state.ball.y - state.ball.radius <= 0) {
+                    state.ball.y = state.ball.radius;
+                    state.velocity.y *= -1;
+                }
+
+                // 横板碰撞 - 修复反弹方向问题
+                if (state.ball.y + state.ball.radius >= CANVAS_HEIGHT - PADDLE_HEIGHT - 20 &&
+                    state.ball.x >= state.paddle.x &&
+                    state.ball.x <= state.paddle.x + state.paddle.width &&
+                    state.ball.y + state.ball.radius < CANVAS_HEIGHT - PADDLE_HEIGHT - 15) { // 防止重复碰撞
+
+                    // 将球放到板子上面
+                    state.ball.y = CANVAS_HEIGHT - PADDLE_HEIGHT - 20 - state.ball.radius;
+
+                    // 计算撞击点在板子上的相对位置 (0 到 1)
+                    const hitPos = (state.ball.x - state.paddle.x) / state.paddle.width;
+
+                    // 将相对位置映射到反弹角度 (-60度到60度)
+                    // 左边反弹到左边，右边反弹到右边
+                    const maxAngle = 70 * Math.PI / 180; // 最大70度
+                    const angle = (hitPos - 0.5) * 2 * maxAngle;
+
+                    // 计算新的速度向量，保持速度大小不变
+                    const speed = state.baseSpeed;
+
+                    // 新的速度方向：向上（负Y）加上根据撞击位置决定的水平分量
+                    // 这样球会按照入射角等于出射角的原理反弹
+                    state.velocity.x = Math.sin(angle) * speed;
+                    state.velocity.y = -Math.cos(angle) * speed; // 负值表示向上
+                }
+
+                // 球掉到底部，游戏结束
+                if (state.ball.y + state.ball.radius >= CANVAS_HEIGHT) {
+                    gameStateRef.current.gameActive = false;
+                    gameOverHandler();
+                    return;
+                }
+
+                // 障碍物碰撞
+                let anyBrickHit = false;
+                state.bricks.forEach(brick => {
+                    if (!brick.active) return;
+
+                    // 保存碰撞前的位置用于判断碰撞方向
+                    const prevX = state.ball.x - state.velocity.x;
+                    const prevY = state.ball.y - state.velocity.y;
+
+                    // 简单的AABB碰撞检测
+                    if (state.ball.x + state.ball.radius > brick.x &&
+                        state.ball.x - state.ball.radius < brick.x + brick.width &&
+                        state.ball.y + state.ball.radius > brick.y &&
+                        state.ball.y - state.ball.radius < brick.y + brick.height) {
+
+                        brick.active = false;
+                        anyBrickHit = true;
+
+                        // 更新分数
+                        state.score += brick.points;
+                        setScore(state.score);
+
+                        // 判断碰撞方向并反弹
+                        const overlapLeft = (state.ball.x + state.ball.radius) - brick.x;
+                        const overlapRight = (brick.x + brick.width) - (state.ball.x - state.ball.radius);
+                        const overlapTop = (state.ball.y + state.ball.radius) - brick.y;
+                        const overlapBottom = (brick.y + brick.height) - (state.ball.y - state.ball.radius);
+
+                        // 找出最小的重叠量，那就是碰撞方向
+                        const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+                        if (minOverlap === overlapLeft || minOverlap === overlapRight) {
+                            // 水平方向碰撞
+                            state.velocity.x *= -1;
+                        } else {
+                            // 垂直方向碰撞
+                            state.velocity.y *= -1;
+                        }
+
+                        // 确保速度大小保持不变
+                        const currentSpeed = Math.sqrt(state.velocity.x ** 2 + state.velocity.y ** 2);
+                        if (currentSpeed > 0) {
+                            state.velocity.x = (state.velocity.x / currentSpeed) * state.baseSpeed;
+                            state.velocity.y = (state.velocity.y / currentSpeed) * state.baseSpeed;
+                        }
+                    }
+                });
+
+                if (anyBrickHit) {
+                    const remaining = state.bricks.filter(b => b.active).length;
+                    setBricksRemaining(remaining);
+
+                    if (remaining === 0) {
+                        state.gameActive = false;
+                        goToNextLevel();
+                    }
+                }
+
+                drawGame();
+            }, [drawGame, gameOverHandler, goToNextLevel, isPaused]);
+
+            // 动画循环
+            useEffect(() => {
+                if (gameActive && !isPaused) {
+                    const animate = () => {
+                        updateGame();
+                        animationRef.current = requestAnimationFrame(animate);
+                    };
+                    animationRef.current = requestAnimationFrame(animate);
+                }
+                return () => {
+                    if (animationRef.current) {
+                        cancelAnimationFrame(animationRef.current);
+                    }
+                };
+            }, [gameActive, isPaused, updateGame]);
+
+            // 计时器
+            useEffect(() => {
+                if (gameActive && !isPaused) {
+                    startTimeRef.current = Date.now() - elapsedSeconds * 1000;
+                    timerRef.current = setInterval(() => {
+                        setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+                    }, 200);
+                }
+                return () => clearInterval(timerRef.current);
+            }, [gameActive, isPaused, elapsedSeconds]);
+
+            // 键盘控制
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (!gameActive || isPaused) return;
+
+                    const key = e.key.toLowerCase();
+
+                    if (key === 'arrowleft' || key === 'a') {
+                        e.preventDefault();
+                        keyStateRef.current.left = true;
+                    }
+                    if (key === 'arrowright' || key === 'd') {
+                        e.preventDefault();
+                        keyStateRef.current.right = true;
+                    }
+                    // 空格键暂停
+                    if (key === ' ') {
+                        e.preventDefault();
+                        pauseGame();
+                    }
+                };
+
+                const handleKeyUp = (e) => {
+                    const key = e.key.toLowerCase();
+
+                    if (key === 'arrowleft' || key === 'a') {
+                        e.preventDefault();
+                        keyStateRef.current.left = false;
+                    }
+                    if (key === 'arrowright' || key === 'd') {
+                        e.preventDefault();
+                        keyStateRef.current.right = false;
+                    }
+                };
+
+                window.addEventListener('keydown', handleKeyDown);
+                window.addEventListener('keyup', handleKeyUp);
+
+                return () => {
+                    window.removeEventListener('keydown', handleKeyDown);
+                    window.removeEventListener('keyup', handleKeyUp);
+                };
+            }, [gameActive, isPaused, pauseGame]);
+
+            // 触摸控制 - 优化手机端
+            useEffect(() => {
+                const handleTouchStart = (e) => {
+                    if (!gameActive || isPaused) return;
+                    e.preventDefault();
+                    updatePaddlePosition(e.touches[0]);
+                };
+
+                const handleTouchMove = (e) => {
+                    if (!gameActive || isPaused) return;
+                    e.preventDefault();
+                    updatePaddlePosition(e.touches[0]);
+                };
+
+                const handleTouchEnd = (e) => {
+                    e.preventDefault();
+                    // 触摸结束时不操作
+                };
+
+                const updatePaddlePosition = (touch) => {
+                    const canvas = canvasRef.current;
+                    if (!canvas) return;
+
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+
+                    // 计算触摸位置相对于画布的X坐标
+                    let touchX = (touch.clientX - rect.left) * scaleX;
+                    // 限制在板子宽度范围内
+                    touchX = Math.max(0, Math.min(touchX, CANVAS_WIDTH - gameStateRef.current.paddle.width));
+
+                    gameStateRef.current.paddle.x = touchX;
+                    drawGame();
+                };
+
+                const canvas = canvasRef.current;
+                if (canvas) {
+                    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+                    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+                    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+                }
+
+                return () => {
+                    if (canvas) {
+                        canvas.removeEventListener('touchstart', handleTouchStart);
+                        canvas.removeEventListener('touchmove', handleTouchMove);
+                        canvas.removeEventListener('touchend', handleTouchEnd);
+                    }
+                };
+            }, [gameActive, isPaused, drawGame]);
+
+            // 鼠标移动控制横板
+            useEffect(() => {
+                const handleMouseMove = (e) => {
+                    if (!gameActive || isPaused) return;
+
+                    const canvas = canvasRef.current;
+                    if (!canvas) return;
+
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+
+                    let mouseX = (e.clientX - rect.left) * scaleX;
+                    mouseX = Math.max(0, Math.min(mouseX, CANVAS_WIDTH - gameStateRef.current.paddle.width));
+
+                    gameStateRef.current.paddle.x = mouseX;
+                    drawGame();
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+                return () => window.removeEventListener('mousemove', handleMouseMove);
+            }, [gameActive, isPaused, drawGame]);
+
+            // 休息一会
+            const takeRest = useCallback(() => {
+                setGameActive(false);
+                setIsPaused(false);
+                setGameOver(false);
+                setShowPauseModal(false);
+                setShowGameOverModal(false);
+
+                drawGame();
+                showToastMsg('休息一下 ~ 点击开始继续');
+            }, [drawGame, showToastMsg]);
+
+            return (
+                <div className="tetris-container">
+                    <h1>🎯 弹球大冒险</h1>
+
+                    <div className="game-panel">
+                        <div className="play-area">
+                            <div className="canvas-container">
+                                <canvas
+                                    ref={canvasRef}
+                                    width={CANVAS_WIDTH}
+                                    height={CANVAS_HEIGHT}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="info-area">
+                            <div className="stat-item">
+                                <div className="stat-label">得分</div>
+                                <div className="stat-value">{score}</div>
+                            </div>
+
+                            <div className="stat-item">
+                                <div className="stat-label">等级</div>
+                                <div className="stat-value">{level}</div>
+                                <div className="level-info">速度 {gameStateRef.current.baseSpeed?.toFixed(1) || '3.0'}</div>
+                            </div>
+
+                            <div className="stat-item">
+                                <div className="stat-label">时间</div>
+                                <div className="stat-value">
+                                    {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
+                                    {String(elapsedSeconds % 60).padStart(2, '0')}
+                                </div>
+                            </div>
+
+                            <div className="next-piece">
+                                <div className="next-title">剩余障碍</div>
+                                <div className="stat-value" style={{ fontSize: '24px' }}>{bricksRemaining}</div>
+                                <div className="level-progress">
+                                    <div
+                                        className="progress-bar"
+                                        style={{ width: `${gameStateRef.current.bricks.length ?
+                                            ((gameStateRef.current.bricks.length - bricksRemaining) / gameStateRef.current.bricks.length) * 100 : 0}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="button-group">
+                        <button
+                            className="btn btn-success"
+                            onClick={startNewGame}
+                            disabled={gameActive && !isPaused}
+                        >
+                            开始
+                        </button>
+                        <button
+                            className="btn btn-warning"
+                            onClick={pauseGame}
+                            disabled={!gameActive || isPaused}
+                        >
+                            暂停
+                        </button>
+                        <button
+                            className="btn btn-danger"
+                            onClick={resetGame}
+                        >
+                            重置
+                        </button>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={takeRest}
+                        >
+                            休息
+                        </button>
+                    </div>
+
+                    <div className="instructions">
+                        <span className="key-hint">←/A</span> <span className="key-hint">→/D</span> 键盘移动 |
+                        <span className="key-hint">空格</span> 暂停 |
+                        🖱️ 鼠标/👆 手指移动 | 等级越高障碍越多速度越快
+                    </div>
+
+                    {/* 暂停模态 */}
+                    <div className={`modal ${showPauseModal ? 'show' : ''}`}>
+                        <div className="modal-content">
+                            <h2>⏸️ 游戏暂停</h2>
+                            <p>当前等级: {level} · 得分: {score}</p>
+                            <div className="button-group" style={{ marginTop: '16px' }}>
+                                <button className="btn btn-success" onClick={resumeGame}>继续</button>
+                                <button className="btn btn-secondary" onClick={resetGame}>重置</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 游戏结束模态框 */}
+                    <div className={`modal ${showGameOverModal ? 'show' : ''}`}>
+                        <div className="modal-content">
+                            <h2 style={{ color: 'var(--btn-danger)' }}>💀 游戏结束</h2>
+
+                            <div className="record-card">
+                                <p><strong>本次成绩</strong><br />
+                                   等级 {level} · 得分 {score}<br />
+                                   时间 {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
+                                   {String(elapsedSeconds % 60).padStart(2, '0')}
+                                </p>
+                                <p><strong>🏆 历史最佳</strong><br />
+                                   等级 {bestRecord.level} · 得分 {bestRecord.score}<br />
+                                   时间 {String(Math.floor(bestRecord.time / 60)).padStart(2, '0')}:
+                                   {String(bestRecord.time % 60).padStart(2, '0')}
+                                </p>
+                            </div>
+
+                            <div className="button-group">
+                                <button className="btn btn-primary" onClick={startNewGame}>再玩一局</button>
+                                <button className="btn btn-secondary" onClick={resetGame}>重置</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Toast提示 */}
+                    {toast.show && <div className="toast">{toast.msg}</div>}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
